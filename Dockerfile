@@ -1,11 +1,11 @@
 FROM python:3
 
-WORKDIR /authzpoc
 
-COPY requirements.txt ./
+WORKDIR /authzpoc
+COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
+WORKDIR /authzpoc/src
+RUN python setup.py develop
 
 #CMD [ "python", "./your-daemon-or-script.py" ]

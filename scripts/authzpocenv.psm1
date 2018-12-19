@@ -20,7 +20,7 @@ function Start-AuthzDocker {
         docker run `
             -it `
             --rm `
-            -p 5000:5000 `
+            -p 8888:8888 `
             --mount type=bind,source=$env:PSGIVENS_REPOS/authzpoc,target=/authzpoc `
             $Container /bin/bash
     } else {
