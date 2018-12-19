@@ -4,15 +4,11 @@ import os
 from flask import Flask, Blueprint
 from rest_api_demo import settings
 from rest_api_demo.api.authn.endpoints.roles import ns as authn_roles_namespace
-from rest_api_demo.api.authn.endpoints.posts import ns as authn_posts_namespace
-from rest_api_demo.api.authn.endpoints.categories import ns as authn_categories_namespace
-from rest_api_demo.api.authz.endpoints.posts import ns as authz_posts_namespace
-from rest_api_demo.api.authz.endpoints.categories import ns as authz_categories_namespace
+from rest_api_demo.api.authz.endpoints.features import ns as authz_features_namespace
 from rest_api_demo.api.blog.endpoints.posts import ns as blog_posts_namespace
 from rest_api_demo.api.blog.endpoints.categories import ns as blog_categories_namespace
 from rest_api_demo.api.restplus import api
 from rest_api_demo.database import db
-
 from rest_api_demo.database import reset_database
 
 app = Flask(__name__)
@@ -36,11 +32,8 @@ def initialize_app(flask_app):
 
     blueprint = Blueprint('api', __name__, url_prefix='/api')
     api.init_app(blueprint)
-    api.add_namespace(authn_posts_namespace)
-    api.add_namespace(authn_categories_namespace)
     api.add_namespace(authn_roles_namespace)
-    api.add_namespace(authz_posts_namespace)
-    api.add_namespace(authz_categories_namespace)
+    api.add_namespace(authz_features_namespace)
     api.add_namespace(blog_posts_namespace)
     api.add_namespace(blog_categories_namespace)
     flask_app.register_blueprint(blueprint)
@@ -50,8 +43,8 @@ def initialize_app(flask_app):
 
 def main():
     initialize_app(app)
-    with app.app_context():
-        reset_database()
+    # with app.app_context():
+    #     reset_database()
 
     log.info('>>>>> Starting development server at http://{}/api/ <<<<<'.format(app.config['SERVER_NAME']))
     app.run(debug=settings.FLASK_DEBUG, host=settings.FLASK_SERVER_HOST)

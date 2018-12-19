@@ -2,41 +2,39 @@ import logging
 
 from flask import request
 from flask_restplus import Resource
-from rest_api_demo.api.blog.business import create_category, delete_category, update_category
-from rest_api_demo.api.blog.serializers import category, category_with_posts
+from rest_api_demo.api.authz.business import create_category, delete_category, update_category
+from rest_api_demo.api.authz.parsers import features_request_arguments
+from rest_api_demo.api.authz.serializers import feature, category, category_with_posts
 from rest_api_demo.api.restplus import api
-from rest_api_demo.database.models import Category
+from rest_api_demo.database.models import Category, Feature, Role
 
 log = logging.getLogger(__name__)
 
-ns = api.namespace('authn/categories', description='Operations related to blog categories')
+ns = api.namespace('authz/features', description='Features that the user may be authorized to use.')
 
 
 @ns.route('/')
-class CategoryCollection(Resource):
+class FeatureCollection(Resource):
 
-    @api.marshal_list_with(category)
+    @api.expect(features_request_arguments)
+    @api.marshal_list_with(feature)
     def get(self):
         """
-        Returns list of blog categories.
+        Returns list of features available to the user
         """
-        categories = Category.query.all()
-        return categories
 
-    @api.response(201, 'Category successfully created.')
-    @api.expect(category)
-    def post(self):
-        """
-        Creates a new blog category.
-        """
-        data = request.json
-        create_category(data)
-        return None, 201
+        args = features_request_arguments.parse_args(request)
+        user_id = args.get('user-id')
+        practice_name = args.get('practice-name')
+        location_name = args.get('location-name')
+        role_name = args.get('role-name')
+
+        return Feature.query.all()
 
 
 @ns.route('/<int:id>')
 @api.response(404, 'Category not found.')
-class CategoryItem(Resource):
+class FeatureItem(Resource):
 
     @api.marshal_with(category_with_posts)
     def get(self, id):

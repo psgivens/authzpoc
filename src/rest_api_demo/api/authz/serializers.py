@@ -1,6 +1,18 @@
 from flask_restplus import fields
 from rest_api_demo.api.restplus import api
 
+feature = api.model('Feature', {
+    'id': fields.Integer(readOnly=True, description='The unique identifier of a feature.'),
+    'feature_name': fields.String(required=True, description='Name of the feature'),
+})
+
+
+
+
+
+
+
+
 blog_post = api.model('Blog post', {
     'id': fields.Integer(readOnly=True, description='The unique identifier of a blog post'),
     'title': fields.String(required=True, description='Article title'),
