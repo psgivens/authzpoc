@@ -23,8 +23,7 @@ class RolesCollection(Resource):
         """
         args = role_request_arguments.parse_args(request)
         user_id = args.get('user-id')
-        practice_name = args.get('practice-name')
-        location_name = args.get('location-name')
+        account_id = args.get('account-id')
         r = AuthnRole('samplerole')
         rs = [r]
 

@@ -126,6 +126,19 @@ class AuthzFeature(db.Model):
     def __repr__(self):
         return '<Feature %r>' % self.feature_name
 
+# 1 feature for 1+ roles
+# 1 role has 1+ features
+class AuthzRoleFeature(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    feature_name = db.Column(db.String(80))
+    role_id = db.Column(db.String(80))
+
+    def __init__(self, feature_name):
+        self.feature_name = feature_name
+
+    def __repr__(self):
+        return '<Feature %r>' % self.feature_name
+
 class AuthzWebAction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     resource_name = db.Column(db.String(80))

@@ -25,9 +25,9 @@ class FeatureCollection(Resource):
 
         args = features_request_arguments.parse_args(request)
         user_id = args.get('user-id')
-        practice_name = args.get('practice-name')
-        location_name = args.get('location-name')
-        role_name = args.get('role-name')
+        account_id = args.get('account-id')
+        org_unit_type = args.get('org-unit-type')
+        org_unit_ids = args.get('org-unit-ids')
 
         return AuthzFeature.query.all()
 
@@ -41,7 +41,7 @@ class FeatureItem(Resource):
         """
         Returns a category with a list of posts.
         """
-        return Category.query.filter(Category.id == id).one()
+        return AuthzFeature.query.filter(AuthzFeature.id == id).one()
 
     @api.expect(category)
     @api.response(204, 'Category successfully updated.')
@@ -62,7 +62,7 @@ class FeatureItem(Resource):
         * Specify the ID of the category to modify in the request URL path.
         """
         data = request.json
-        update_category(id, data)
+        update_authz_feature(id, data)
         return None, 204
 
     @api.response(204, 'Category successfully deleted.')
@@ -70,5 +70,5 @@ class FeatureItem(Resource):
         """
         Deletes blog category.
         """
-        delete_category(id)
+        delete_authz_feature(id)
         return None, 204
