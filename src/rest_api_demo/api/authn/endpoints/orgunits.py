@@ -22,8 +22,8 @@ class OrgUnitsCollection(Resource):
         """
         args = orgunit_request_arguments.parse_args(request)
         user_id = args.get('user-id')
-        practice_name = args.get('practice-name')
-        location_name = args.get('location-name')
+        account_id = args.get('account-id')
+
 
         return AuthnOrgUnit.query.filter(AuthnOrgUnit.id == user_id).one()
 
@@ -37,3 +37,4 @@ class OrgUnitItem(Resource):
         Returns an orgunit
         """
         return AuthnOrgUnit.query.filter(AuthnOrgUnit.id == id).one()
+

@@ -22,8 +22,6 @@ class AccountsCollection(Resource):
         """
         args = account_request_arguments.parse_args(request)
         user_id = args.get('user-id')
-        practice_name = args.get('practice-name')
-        location_name = args.get('location-name')
 
         return AuthnAccount.query.filter(AuthnAccount.id == user_id).one()
 

@@ -22,9 +22,6 @@ class RolesCollection(Resource):
         Returns Roles
         """
         args = role_request_arguments.parse_args(request)
-        user_id = args.get('user-id')
-        practice_name = args.get('practice-name')
-        location_name = args.get('location-name')
 
         return AuthzRole.query.filter(AuthzRole.id == user_id).one()
 
@@ -37,4 +34,38 @@ class RoleItem(Resource):
         """
         Returns a role
         """
+
+        account_id = args.get('account-id')
+
+        #role has features
         return AuthzRole.query.filter(AuthzRole.id == id).one()
+
+
+    @api.response(204, 'Category successfully updated.')
+    def put(self, id):
+        """
+        Updates a blog category.
+
+        Use this method to change the name of a blog category.
+
+        * Send a JSON object with the new name in the request body.
+
+        ```
+        {
+          "name": "New Category Name"
+        }
+        ```
+
+        * Specify the ID of the category to modify in the request URL path.
+        """
+        data = request.json
+        update_role(id, data)
+        return None, 204
+
+    @api.response(204, 'Category successfully deleted.')
+    def delete(self, id):
+        """
+        Deletes blog category.
+        """
+        delete_role(id)
+        return None, 204

@@ -1,0 +1,154 @@
+@startuml
+title Login (minimal id token, no token exchange)
+autonumber
+user -> ui
+ui -> login
+login -> monolith
+monolith -> cognito : initiateAuth
+cognito -> migrator : migrate if user missing in cognitouser pool
+migrator -> monolith : /legacy-authenticate
+database mysql
+monolith -> mysql : use users table to authenticate
+monolith --> migrator : 200
+migrator --> cognito : store missing user in user pool
+cognito --> monolith : id token, access token, refresh token
+monolith --> login : id token, access token, refresh token
+login --> ui : store id token, access token, refresh token in local storage/cookie
+ui -> "account service" : GET /authn/accounts passing user-id
+ui -> ui : show accounts in dropdown
+user -> ui: select an account from dropdown
+ui -> "authn features service" : GET /authn/features passing user-id, account-id, org-unit-type, org-unit-id
+note right
+    for a user with "user" role:
+    ["appointments:create", "appointments:read", "appointments:update"]
+    for a user with "admin" role:
+    ["appointments:create", "appointments:read", "appointments:update", "appointments:delete"]
+end note
+ui -> ui : enable/disable features
+@enduml
+
+
+
+@startuml
+title API Call (minimal id token scenario, with feature->endpoint mapping)
+autonumber
+user -> ui
+ui -> "api gateway" : /practices/<practice_id>/service/x
+"api gateway" -> "custom authorizer" : authorize
+"custom authorizer" -> "opa" : POST /v1/data/httpapi/authz passing only endpoint context as input
+note right
+    {
+        "input": {
+            "method": "GET",
+            "path": ["practices", "practice1", "dialogtech", "status"]
+        }
+    }
+end note
+"opa" -> "opa" : load context from data
+note right
+import data.user_tenants
+import data.user_tenant_roles
+import data.role_features
+
+default allow = false
+
+# Allow "users" role to get status in their own tenant
+allow {
+  http_api.method = "GET"
+  http_api.path = ["practices", tenant, "dialogtech", "status"]
+  is_member_of_tenant(tenant)
+  is_required_feature_enabled_for_user(["dialogtech:status"])
+}
+
+# Allow "admins" role to publish in their own tenant
+allow {
+  http_api.method = "GET"
+  http_api.path = ["practices", tenant, "dialogtech", "publish"]
+  is_member_of_tenant(tenant)
+  is_required_feature_enabled_for_user(["dialogtech:publish"])
+}
+
+is_member_of_tenant(name) {
+  user_tenant := user_tenants[http_api.user]
+  user_tenant.tenants[name]
+}
+
+is_required_feature_enabled_for_user(required_features) {
+  user_roles := user_tenant_roles[http_api.user][tenant]
+  user_features := role_features[user_roles]
+  required_features[_] = user_features[_]
+}
+end note
+"opa" --> "custom authorizer" : allow or deny
+"custom authorizer" -> "custom authorizer": create_iam_policies(decision)
+"custom authorizer" --> "api gateway" : IAM policies
+"api gateway" -> "api gateway" : allow or deny call
+"api gateway" --> ui : 200 or 403
+@enduml
+
+
+
+@startuml
+title Registering features and policies in ACP service upon deployment (1 opa instance assumed, not using opa bundles: the push model)
+autonumber
+cloudformation -> "ACP registration lambda"
+"ACP registration lambda" -> "authz role service" : PUT /authz/roles/<role_id>
+note right
+{
+    "role_id" : <role_id>
+    "features": ["appointments:create", "appointments:read", "appointments:update"]
+}
+end note
+"ACP registration lambda" -> "opa" : PUT /v1/data/role_features
+note right
+{ "user": {"features": ["appointments:create", "appointments:read", "appointments:update"]} }
+end note
+"ACP registration lambda" -> "authz feature service" : PUT /features/<feature_id>
+note right
+{
+    "path": "/tenants/<tenant_id>/appointments",
+    "method": "GET",
+    "required_features": ["appointments:read"]
+}
+note end
+"ACP registration lambda" -> "ACP registration lambda" : convert_features_to_rego(features)
+"ACP registration lambda" -> "opa" : PUT --data-binary @converted.rego /v1/policies/policy1
+note right
+import data.users
+import data.user_tenants
+import data.user_tenant_roles
+import data.role_features
+
+default allow = false
+
+# Allow "users" role to get status in their own tenant
+allow {
+  input.method = "GET"
+  input.path = ["practices", tenant, "dialogtech", "status"]
+  is_required_feature_enabled_for_user(["dialogtech:status"], tenant)
+}
+
+# Allow "admins" role to publish in their own tenant
+allow {
+  input.method = "GET"
+  input.path = ["practices", tenant, "dialogtech", "publish"]
+  is_required_feature_enabled_for_user(["dialogtech:publish"], tenant)
+}
+
+is_required_feature_enabled_for_user(required_features, tenant) {
+  users[_] = input.user
+
+  user := user_tenants[_]
+  user.user_id == input.user
+  user.tenants[_] == tenant
+
+  user_tenant_role := user_tenant_roles[_]
+  user_tenant_role.user_id = input.user
+  user_tenant_role.tenant_roles[_].tenant_id = tenant
+
+  role_feature := role_features[_]
+  role_feature.role = user_tenant_role.tenant_roles[_].roles[_]
+  role_feature.features[_] = required_features[_]
+}
+end note
+@enduml
