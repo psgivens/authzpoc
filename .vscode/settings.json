@@ -1,4 +1,4 @@
 {
     "terminal.integrated.shell.linux": "/bin/bash",
-    "python.pythonPath": "env/bin/python"
+    "python.pythonPath": "winenv\\Scripts\\python.exe"
 }

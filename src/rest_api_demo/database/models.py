@@ -6,6 +6,77 @@ from datetime import datetime
 
 from rest_api_demo.database import db
 
+class AuthnRole(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role_name = db.Column(db.String(80))
+
+    def __init__(self, role_name):
+        self.role_name = role_name
+
+    def __repr__(self):
+        return '<AuthnRole %r>' % self.role_name
+
+class AuthnAccount(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role_name = db.Column(db.String(80))
+
+    def __init__(self, role_name):
+        self.role_name = role_name
+
+    def __repr__(self):
+        return '<AuthnAccount %r>' % self.role_name
+
+class AuthnOrgUnit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role_name = db.Column(db.String(80))
+
+    def __init__(self, role_name):
+        self.role_name = role_name
+
+    def __repr__(self):
+        return '<AuthnOrgUnit %r>' % self.role_name
+
+class AuthnUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role_name = db.Column(db.String(80))
+
+    def __init__(self, role_name):
+        self.role_name = role_name
+
+    def __repr__(self):
+        return '<AuthnUser %r>' % self.role_name
+
+
+class AuthzRole(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role_name = db.Column(db.String(80))
+
+    def __init__(self, role_name):
+        self.role_name = role_name
+
+    def __repr__(self):
+        return '<AuthzRole %r>' % self.role_name
+
+class AuthzAccount(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role_name = db.Column(db.String(80))
+
+    def __init__(self, role_name):
+        self.role_name = role_name
+
+    def __repr__(self):
+        return '<AuthzAccount %r>' % self.role_name
+
+
+class Item(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role_name = db.Column(db.String(80))
+
+    def __init__(self, role_name):
+        self.role_name = role_name
+
+    def __repr__(self):
+        return '<Generic Item %r>' % self.role_name
 
 
 class Role(db.Model):
@@ -17,7 +88,6 @@ class Role(db.Model):
 
     def __repr__(self):
         return '<Role %r>' % self.role_name
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +116,7 @@ class Context(db.Model):
     def __repr__(self):
         return '<Context %r %s>' % self.practice_name, self.location_name
 
-class Feature(db.Model):
+class AuthzFeature(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     feature_name = db.Column(db.String(80))
 
@@ -56,13 +126,13 @@ class Feature(db.Model):
     def __repr__(self):
         return '<Feature %r>' % self.feature_name
 
-class WebAction(db.Model):
+class AuthzWebAction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     resource_name = db.Column(db.String(80))
     resource_action = db.Column(db.String(8))
 
-    feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'))
-    feature = db.relationship('Feature', backref=db.backref('web_actions', lazy='dynamic'))
+    feature_id = db.Column(db.Integer, db.ForeignKey('authz_feature.id'))
+    feature = db.relationship('AuthzFeature', backref=db.backref('web_actions', lazy='dynamic'))
 
     def __init__(self, resource_name, resource_action, feature):
         self.resource_name = resource_name
@@ -70,7 +140,7 @@ class WebAction(db.Model):
         self.feature = feature
     
     def __repr__(self):
-        return '<WebAction %r %r %r>' % self.resource_name, self.resource_action, self.feature.feature_name
+        return '<AuthzWebAction %r %r %r>' % self.resource_name, self.resource_action, self.feature.feature_name
 
 
 

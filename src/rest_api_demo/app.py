@@ -3,8 +3,13 @@ import logging.config
 import os
 from flask import Flask, Blueprint
 from rest_api_demo import settings
+from rest_api_demo.api.authn.endpoints.accounts import ns as authn_accounts_namespace
+from rest_api_demo.api.authn.endpoints.orgunits import ns as authn_orgunits_namespace
 from rest_api_demo.api.authn.endpoints.roles import ns as authn_roles_namespace
+from rest_api_demo.api.authn.endpoints.users import ns as authn_users_namespace
+from rest_api_demo.api.authz.endpoints.accounts import ns as authz_accounts_namespace
 from rest_api_demo.api.authz.endpoints.features import ns as authz_features_namespace
+from rest_api_demo.api.authz.endpoints.roles import ns as authz_roles_namespace
 from rest_api_demo.api.blog.endpoints.posts import ns as blog_posts_namespace
 from rest_api_demo.api.blog.endpoints.categories import ns as blog_categories_namespace
 from rest_api_demo.api.restplus import api
@@ -16,7 +21,6 @@ logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..
 logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
-
 def configure_app(flask_app):
     flask_app.config['SERVER_NAME'] = settings.FLASK_SERVER_NAME
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = settings.SQLALCHEMY_DATABASE_URI
@@ -26,16 +30,21 @@ def configure_app(flask_app):
     flask_app.config['RESTPLUS_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
     flask_app.config['ERROR_404_HELP'] = settings.RESTPLUS_ERROR_404_HELP
 
-
 def initialize_app(flask_app):
     configure_app(flask_app)
 
     blueprint = Blueprint('api', __name__, url_prefix='/api')
     api.init_app(blueprint)
+    api.add_namespace(authn_accounts_namespace)
+    api.add_namespace(authn_orgunits_namespace)
     api.add_namespace(authn_roles_namespace)
+    api.add_namespace(authn_users_namespace)
+    api.add_namespace(authz_accounts_namespace)
     api.add_namespace(authz_features_namespace)
-    api.add_namespace(blog_posts_namespace)
+    api.add_namespace(authz_roles_namespace)
     api.add_namespace(blog_categories_namespace)
+    api.add_namespace(blog_posts_namespace)
+
     flask_app.register_blueprint(blueprint)
 
     db.init_app(flask_app)
@@ -44,7 +53,7 @@ def initialize_app(flask_app):
 def main():
     initialize_app(app)
     # with app.app_context():
-    #     reset_database()
+    #    reset_database()
 
     log.info('>>>>> Starting development server at http://{}/api/ <<<<<'.format(app.config['SERVER_NAME']))
     app.run(debug=settings.FLASK_DEBUG, host=settings.FLASK_SERVER_HOST)

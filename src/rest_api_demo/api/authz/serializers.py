@@ -1,11 +1,20 @@
 from flask_restplus import fields
 from rest_api_demo.api.restplus import api
 
-feature = api.model('Feature', {
+authz_feature_request = api.model('Feature', {
     'id': fields.Integer(readOnly=True, description='The unique identifier of a feature.'),
     'feature_name': fields.String(required=True, description='Name of the feature'),
 })
 
+authz_account_request = api.model('Feature', {
+    'id': fields.Integer(readOnly=True, description='The unique identifier of a feature.'),
+    'feature_name': fields.String(required=True, description='Name of the feature'),
+})
+
+authz_role = api.model('Authenticated Role', {
+    'id': fields.Integer(required=True, description='The id of the user'),
+    'role_name': fields.String(required=True, description='The name of the role')
+})
 
 
 

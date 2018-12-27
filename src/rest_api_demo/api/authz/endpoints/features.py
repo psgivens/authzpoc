@@ -4,9 +4,9 @@ from flask import request
 from flask_restplus import Resource
 from rest_api_demo.api.authz.business import create_category, delete_category, update_category
 from rest_api_demo.api.authz.parsers import features_request_arguments
-from rest_api_demo.api.authz.serializers import feature, category, category_with_posts
+from rest_api_demo.api.authz.serializers import authz_feature_request, category, category_with_posts
 from rest_api_demo.api.restplus import api
-from rest_api_demo.database.models import Category, Feature, Role
+from rest_api_demo.database.models import Category, AuthzFeature, Item
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ ns = api.namespace('authz/features', description='Features that the user may be 
 class FeatureCollection(Resource):
 
     @api.expect(features_request_arguments)
-    @api.marshal_list_with(feature)
+    @api.marshal_list_with(authz_feature_request)
     def get(self):
         """
         Returns list of features available to the user
@@ -29,7 +29,7 @@ class FeatureCollection(Resource):
         location_name = args.get('location-name')
         role_name = args.get('role-name')
 
-        return Feature.query.all()
+        return AuthzFeature.query.all()
 
 
 @ns.route('/<int:id>')

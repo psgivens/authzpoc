@@ -2,21 +2,21 @@ import logging
 
 from flask import request
 from flask_restplus import Resource
-from rest_api_demo.api.authn.serializers import authn_role
-from rest_api_demo.api.authn.parsers import role_request_arguments
+from rest_api_demo.api.authz.serializers import authz_role
+from rest_api_demo.api.authn.parsers import pagination_arguments, role_request_arguments
 from rest_api_demo.api.restplus import api
-from rest_api_demo.database.models import AuthnRole
+from rest_api_demo.database.models import AuthzRole
 
 log = logging.getLogger(__name__)
 
-ns = api.namespace('authn/roles', description='Operations related to blog posts')
+ns = api.namespace('authz/roles', description='Operations related to blog posts')
 
 
 @ns.route('/')
 class RolesCollection(Resource):
 
     @api.expect(role_request_arguments)
-    @api.marshal_with(authn_role)
+    @api.marshal_with(authz_role)
     def get(self):
         """
         Returns Roles
@@ -25,19 +25,16 @@ class RolesCollection(Resource):
         user_id = args.get('user-id')
         practice_name = args.get('practice-name')
         location_name = args.get('location-name')
-        r = AuthnRole('samplerole')
-        rs = [r]
 
-        return rs
-        # return AuthnRole.query.filter(AuthnRole.id == user_id).one()
+        return AuthzRole.query.filter(AuthzRole.id == user_id).one()
 
 @ns.route('/<int:id>')
 @api.response(404, 'Post not found.')
 class RoleItem(Resource):
 
-    @api.marshal_with(authn_role)
+    @api.marshal_with(authz_role)
     def get(self, id):
         """
         Returns a role
         """
-        return AuthnRole.query.filter(AuthnRole.id == id).one()
+        return AuthzRole.query.filter(AuthzRole.id == id).one()

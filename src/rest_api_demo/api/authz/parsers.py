@@ -11,3 +11,24 @@ features_request_arguments.add_argument('user-id', required=False, help='User Id
 features_request_arguments.add_argument('practice-name', required=False, help='Name of the practice', location='headers')
 features_request_arguments.add_argument('location-name', required=False, help='Location of the practice', location='headers')
 features_request_arguments.add_argument('role-name', required=False, help='Name of Role in relation to practice', location='headers')
+
+
+role_request_arguments = reqparse.RequestParser()
+role_request_arguments.add_argument('user-id', required=False, help='User Id', location='headers')
+role_request_arguments.add_argument('practice-name', required=False, help='Name of the practice', location='headers')
+role_request_arguments.add_argument('location-name', required=False, help='Location of the practice', location='headers')
+
+account_request_arguments = reqparse.RequestParser()
+account_request_arguments.add_argument('user-id', required=False, help='User Id', location='headers')
+account_request_arguments.add_argument('practice-name', required=False, help='Name of the practice', location='headers')
+account_request_arguments.add_argument('location-name', required=False, help='Location of the practice', location='headers')
+
+# orgunit_request_arguments = reqparse.RequestParser()
+# orgunit_request_arguments.add_argument('user-id', required=False, help='User Id', location='headers')
+# orgunit_request_arguments.add_argument('practice-name', required=False, help='Name of the practice', location='headers')
+# orgunit_request_arguments.add_argument('location-name', required=False, help='Location of the practice', location='headers')
+
+# user_request_arguments = reqparse.RequestParser()
+# user_request_arguments.add_argument('user-id', required=False, help='User Id', location='headers')
+# user_request_arguments.add_argument('practice-name', required=False, help='Name of the practice', location='headers')
+# user_request_arguments.add_argument('location-name', required=False, help='Location of the practice', location='headers')

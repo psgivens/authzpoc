@@ -58,9 +58,9 @@ Function Build-AuthzImage {
 Function Update-AuthzModule {
     $MyPSModulePath = "{0}/.local/share/powershell/Modules" -f (ls -d ~)
     mkdir -p $MyPSModulePath/authzpocenv
-    Write-Host ("Copying {0}/zapdast/scripts/ZapDastEnv.psm1 to {1}/ZapDastEnv/" -f $env:ZAPDAST_REPOS,  $MyPSModulePath)
-    cp -f $env:ZAPDAST_REPOS/authzpoc/scripts/authzpocenv.psm1  $MyPSModulePath/authzpocenv/
-    Write-Host "Force import-module ZapDastEnv"
+    Write-Host ("Copying {0}/authzpoc/scripts/authzpocenv.psm1 to {1}/authzpocenv/" -f $env:PSGIVENS_REPOS,  $MyPSModulePath)
+    cp -f $env:PSGIVENS_REPOS/authzpoc/scripts/authzpocenv.psm1  $MyPSModulePath/authzpocenv/
+    Write-Host "Force import-module authzpocenv"
     Import-Module authzpocenv -Force 
 }
 

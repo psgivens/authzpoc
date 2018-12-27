@@ -4,7 +4,8 @@ db = SQLAlchemy()
 
 
 def reset_database():
-    from rest_api_demo.database.models import Post, Category, Role, User, Context, Feature, WebAction
+    from rest_api_demo.database.models import Post, Category, Role, Item, User, Context, AuthzFeature, AuthzWebAction, AuthnRole, AuthzRole, AuthnAccount, AuthzAccount
+            
     db.drop_all()
     db.create_all()
 
@@ -29,14 +30,14 @@ def reset_database():
     db.session.add(context_smith_sm)
 
     # Features
-    feature_blog_reader = Feature('Blog reader')
-    feature_blog_publisher = Feature('Blog publisher')
+    feature_blog_reader = AuthzFeature('Blog reader')
+    feature_blog_publisher = AuthzFeature('Blog publisher')
 
     # web actions
-    action_blog_get = WebAction('/api/blogs', 'GET', feature_blog_reader)
-    action_blog_post = WebAction('/api/blogs', 'POST', feature_blog_publisher)
-    action_blog_put = WebAction('/api/blogs', 'PUT', feature_blog_publisher)
-    action_blog_delete = WebAction('/api/blogs', 'DELETE', feature_blog_publisher)
+    action_blog_get = AuthzWebAction('/api/blogs', 'GET', feature_blog_reader)
+    action_blog_post = AuthzWebAction('/api/blogs', 'POST', feature_blog_publisher)
+    action_blog_put = AuthzWebAction('/api/blogs', 'PUT', feature_blog_publisher)
+    action_blog_delete = AuthzWebAction('/api/blogs', 'DELETE', feature_blog_publisher)
 
     db.session.add(action_blog_get)
     db.session.add(action_blog_post)
